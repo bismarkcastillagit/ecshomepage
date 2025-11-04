@@ -9,7 +9,8 @@ export default function ContactForm() {
     name: '',
     company: '',
     email: '',
-    message: ''
+    message: '',
+    website: '' // Honeypot field - should remain empty
   });
 
   const [errors, setErrors] = useState<{[key: string]: string}>({});
@@ -52,6 +53,15 @@ export default function ContactForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Honeypot check - if website field is filled, it's a bot
+    if (formData.website) {
+      console.log('Spam detected via honeypot');
+      // Silently reject without showing error
+      setIsSubmitted(true);
+      setTimeout(() => setIsSubmitted(false), 5000);
+      return;
+    }
+
     if (!validateForm()) {
       return;
     }
@@ -60,26 +70,30 @@ export default function ContactForm() {
     setSubmitError(null);
 
     try {
-      // Prepare submission data
-      const submission: ContactSubmission = {
-        name: formData.name.trim(),
-        company: formData.company.trim() || null as any,
-        email: formData.email.trim(),
-        message: formData.message.trim(),
-      };
+      // Submit to API route (handles both Supabase and email)
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name.trim(),
+          company: formData.company.trim() || undefined,
+          email: formData.email.trim(),
+          message: formData.message.trim(),
+          website: formData.website, // Include honeypot field
+        }),
+      });
 
-      // Insert into Supabase
-      const { error } = await supabase
-        .from('contact_submissions')
-        .insert([submission]);
+      const data = await response.json();
 
-      if (error) {
-        throw error;
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to submit form');
       }
 
       // Success!
       setIsSubmitted(true);
-      setFormData({ name: '', company: '', email: '', message: '' });
+      setFormData({ name: '', company: '', email: '', message: '', website: '' });
 
       // Reset success message after 5 seconds
       setTimeout(() => {
@@ -173,6 +187,20 @@ export default function ContactForm() {
           placeholder="Tell us about your project or how we can help..."
         />
         {errors.message && <p className="text-red-500 text-sm mt-1">{errors.message}</p>}
+      </div>
+
+      {/* Honeypot field - hidden from humans, visible to bots */}
+      <div className="absolute left-[-9999px]" aria-hidden="true">
+        <label htmlFor="website">Website</label>
+        <input
+          type="text"
+          id="website"
+          name="website"
+          value={formData.website}
+          onChange={handleChange}
+          tabIndex={-1}
+          autoComplete="off"
+        />
       </div>
 
       <div className="text-center">

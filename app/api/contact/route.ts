@@ -8,7 +8,17 @@ export async function POST(request: NextRequest) {
   try {
     // Parse request body
     const body = await request.json();
-    const { name, company, email, message } = body;
+    const { name, company, email, message, website } = body;
+
+    // Honeypot check - if website field is filled, it's a bot
+    if (website) {
+      console.log('Spam submission detected via honeypot');
+      // Return success to fool bots, but don't save or send email
+      return NextResponse.json(
+        { success: true, message: 'Form submitted successfully' },
+        { status: 200 }
+      );
+    }
 
     // Validate required fields
     if (!name?.trim() || !email?.trim() || !message?.trim()) {
