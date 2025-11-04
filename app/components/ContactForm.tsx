@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Button from './Button';
+import { supabase, type ContactSubmission } from '@/lib/supabase';
 
 export default function ContactForm() {
   const [formData, setFormData] = useState({
@@ -14,6 +15,7 @@ export default function ContactForm() {
   const [errors, setErrors] = useState<{[key: string]: string}>({});
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const validateForm = () => {
     const newErrors: {[key: string]: string} = {};
@@ -55,18 +57,42 @@ export default function ContactForm() {
     }
 
     setIsSubmitting(true);
+    setSubmitError(null);
 
-    // Simulate form submission (in production, this would send to an API)
-    setTimeout(() => {
+    try {
+      // Prepare submission data
+      const submission: ContactSubmission = {
+        name: formData.name.trim(),
+        company: formData.company.trim() || null as any,
+        email: formData.email.trim(),
+        message: formData.message.trim(),
+      };
+
+      // Insert into Supabase
+      const { error } = await supabase
+        .from('contact_submissions')
+        .insert([submission]);
+
+      if (error) {
+        throw error;
+      }
+
+      // Success!
       setIsSubmitted(true);
-      setIsSubmitting(false);
       setFormData({ name: '', company: '', email: '', message: '' });
 
       // Reset success message after 5 seconds
       setTimeout(() => {
         setIsSubmitted(false);
       }, 5000);
-    }, 1000);
+    } catch (error: any) {
+      console.error('Error submitting form:', error);
+      setSubmitError(
+        error.message || 'Failed to submit form. Please try again or contact us directly at sales@ecsvault.com'
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const inputBaseStyles = "w-full bg-[var(--background-dark)] border border-gray-800 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[var(--accent-purple)] focus:ring-2 focus:ring-purple-500/20 transition-all duration-300";
@@ -77,6 +103,12 @@ export default function ContactForm() {
       {isSubmitted && (
         <div className="bg-green-900/30 border border-green-500/50 rounded-lg p-4 text-green-300 text-center animate-fade-in">
           Thanks for reaching out! We&apos;ll get back to you soon.
+        </div>
+      )}
+
+      {submitError && (
+        <div className="bg-red-900/30 border border-red-500/50 rounded-lg p-4 text-red-300 text-center animate-fade-in">
+          {submitError}
         </div>
       )}
 
