@@ -20,7 +20,8 @@ export const metadata: Metadata = {
   openGraph: {
     title: "ECSVault | Elevate Cyber Solutions",
     description: "Empowering Businesses Through Secure Cloud, Automation, and AI",
-    type: "website"    
+    type: "website",
+    images: ['/ecsvault-logo.png'],
   },
 };
 
