@@ -17,10 +17,15 @@ export const metadata: Metadata = {
   description: "Empowering businesses through secure cloud architecture, cybersecurity consulting, DevOps automation, and AI-powered solutions. Expert guidance from Elevate Cyber Solutions.",
   keywords: ["cloud architecture", "cybersecurity", "DevOps", "AI automation", "cloud migration", "security compliance", "managed cloud services"],
   authors: [{ name: "Elevate Cyber Solutions" }],
+  icons: {
+    icon: '/ecsvault-logo.png',
+    apple: '/ecsvault-logo.png',
+  },
   openGraph: {
     title: "ECSVault | Elevate Cyber Solutions",
     description: "Empowering Businesses Through Secure Cloud, Automation, and AI",
     type: "website",
+    images: ['/ecsvault-logo.png'],
   },
 };
 
