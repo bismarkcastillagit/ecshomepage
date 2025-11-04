@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
     // Send email notification using Resend
     try {
       const emailResult = await resend.emails.send({
-        from: 'ECSVault Contact Form <noreply@ecsvault.com>', // Resend's test sender
+        from: process.env.EMAIL_FROM || 'ECSVault Contact Form <noreply@ecsvault.com>',
         to: process.env.ADMIN_EMAIL || 'sales@ecsvault.com',
         subject: `New Contact Form Submission from ${name}`,
         html: `
