@@ -133,6 +133,12 @@ export const ChatWidget: React.FC = () => {
       setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
+      // Refocus the input after AI responds
+      setTimeout(() => {
+        if (inputRef.current) {
+          inputRef.current.focus();
+        }
+      }, 100);
     }
   };
 
@@ -297,7 +303,7 @@ export const ChatWidget: React.FC = () => {
       {/* Floating Launcher Button */}
       <button
         onClick={handleToggleOpen}
-        aria-expanded={isOpen}
+        aria-expanded={isOpen ? 'true' : 'false'}
         aria-label={isOpen ? 'Close chat' : 'Open chat'}
         className="fixed bottom-4 right-4 w-14 h-14 bg-gradient-to-br from-[var(--accent-purple)] to-purple-700 rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-300 flex items-center justify-center z-50 group"
       >
