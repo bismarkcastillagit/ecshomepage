@@ -22,7 +22,7 @@ async function sendEmail(options: {
   subject: string;
   html: string;
 }) {
-  const from = process.env.SMTP_FROM || process.env.EMAIL_FROM || 'ECSVault Contact Form <noreply@ecsvault.com>';
+  const from = process.env.SMTP_FROM || 'ECSVault <ecs@ecsvault.com>';
 
   // Try SMTP first if configured
   if (process.env.SMTP_HOST && process.env.SMTP_USER) {
