@@ -1,8 +1,60 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
+import nodemailer from 'nodemailer';
 import { supabase } from '@/lib/supabase';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
+
+// SMTP transporter for custom email server
+const smtpTransporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST,
+  port: parseInt(process.env.SMTP_PORT || '465'),
+  secure: true, // SSL
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  },
+});
+
+// Send email via SMTP, fallback to Resend
+async function sendEmail(options: {
+  to: string;
+  subject: string;
+  html: string;
+}) {
+  const from = process.env.SMTP_FROM || process.env.EMAIL_FROM || 'ECSVault Contact Form <noreply@ecsvault.com>';
+
+  // Try SMTP first if configured
+  if (process.env.SMTP_HOST && process.env.SMTP_USER) {
+    try {
+      const result = await smtpTransporter.sendMail({
+        from,
+        to: options.to,
+        subject: options.subject,
+        html: options.html,
+      });
+      console.log('Email sent via SMTP:', result.messageId);
+      return { success: true, method: 'smtp' };
+    } catch (smtpError: any) {
+      console.error('SMTP failed, trying Resend fallback:', smtpError.message);
+    }
+  }
+
+  // Fallback to Resend
+  try {
+    const result = await resend.emails.send({
+      from,
+      to: options.to,
+      subject: options.subject,
+      html: options.html,
+    });
+    console.log('Email sent via Resend:', result);
+    return { success: true, method: 'resend' };
+  } catch (resendError: any) {
+    console.error('Resend also failed:', resendError.message);
+    throw new Error(`All email methods failed. SMTP and Resend both unavailable.`);
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -57,11 +109,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Send email notification using Resend
+    // Send email notification (SMTP first, Resend fallback)
     try {
-      const emailResult = await resend.emails.send({
-        from: process.env.EMAIL_FROM || 'ECSVault Contact Form <noreply@ecsvault.com>',
-        to: process.env.ADMIN_EMAIL || 'sales@ecsvault.com',
+      const emailResult = await sendEmail({
+        to: process.env.ADMIN_EMAIL || 'bismark@ecsvault.com',
         subject: `New Contact Form Submission from ${name}`,
         html: `
           <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
@@ -88,7 +139,7 @@ export async function POST(request: NextRequest) {
         `,
       });
 
-      console.log('Email sent successfully:', emailResult);
+      console.log('Email sent successfully via:', emailResult.method);
     } catch (emailError: any) {
       // Log email error but don't fail the request
       // The submission is already saved to database
