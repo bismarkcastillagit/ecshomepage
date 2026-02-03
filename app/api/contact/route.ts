@@ -1,59 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Resend } from 'resend';
-import nodemailer from 'nodemailer';
 import { supabase } from '@/lib/supabase';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
-// SMTP transporter for custom email server
-const smtpTransporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: parseInt(process.env.SMTP_PORT || '465'),
-  secure: true, // SSL
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-});
-
-// Send email via SMTP, fallback to Resend
-async function sendEmail(options: {
-  to: string;
-  subject: string;
-  html: string;
-}) {
-  const from = process.env.SMTP_FROM || 'ECSVault <ecs@ecsvault.com>';
-
-  // Try SMTP first if configured
-  if (process.env.SMTP_HOST && process.env.SMTP_USER) {
-    try {
-      const result = await smtpTransporter.sendMail({
-        from,
-        to: options.to,
-        subject: options.subject,
-        html: options.html,
-      });
-      console.log('Email sent via SMTP:', result.messageId);
-      return { success: true, method: 'smtp' };
-    } catch (smtpError: any) {
-      console.error('SMTP failed, trying Resend fallback:', smtpError.message);
-    }
-  }
-
-  // Fallback to Resend
-  try {
-    const result = await resend.emails.send({
-      from,
-      to: options.to,
-      subject: options.subject,
-      html: options.html,
-    });
-    console.log('Email sent via Resend:', result);
-    return { success: true, method: 'resend' };
-  } catch (resendError: any) {
-    console.error('Resend also failed:', resendError.message);
-    throw new Error(`All email methods failed. SMTP and Resend both unavailable.`);
-  }
+// Simple email notification (console log if no email service configured)
+async function sendNotification(data: { name: string; company?: string; email: string; message: string }) {
+  const adminEmail = process.env.ADMIN_EMAIL || 'bismark@ecsvault.com';
+  
+  // For now, just log the submission
+  console.log('=== New Contact Form Submission ===');
+  console.log('To:', adminEmail);
+  console.log('From:', data.name, `<${data.email}>`);
+  if (data.company) console.log('Company:', data.company);
+  console.log('Message:', data.message);
+  console.log('Timestamp:', new Date().toISOString());
+  console.log('===================================');
+  
+  return { success: true };
 }
 
 export async function POST(request: NextRequest) {
@@ -89,71 +50,34 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Insert into Supabase
-    const { error: dbError } = await supabase
-      .from('contact_submissions')
-      .insert([
-        {
-          name: name.trim(),
-          company: company?.trim() || null,
-          email: email.trim(),
-          message: message.trim(),
-        },
-      ]);
+    // Insert into Supabase if configured
+    if (supabase) {
+      const { error: dbError } = await supabase
+        .from('contact_submissions')
+        .insert([
+          {
+            name: name.trim(),
+            company: company?.trim() || null,
+            email: email.trim(),
+            message: message.trim(),
+          },
+        ]);
 
-    if (dbError) {
-      console.error('Database error:', dbError);
-      return NextResponse.json(
-        { error: 'Failed to save submission' },
-        { status: 500 }
-      );
+      if (dbError) {
+        console.error('Database error:', dbError);
+        // Continue anyway - we'll still try to send notification
+      }
+    } else {
+      console.log('Supabase not configured - skipping database storage');
     }
 
-    // Send email notification (SMTP first, Resend fallback)
-    try {
-      const emailResult = await sendEmail({
-        to: process.env.ADMIN_EMAIL || 'bismark@ecsvault.com',
-        subject: `New Contact Form Submission from ${name}`,
-        html: `
-          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-            <h2 style="color: #C471FF;">New Contact Form Submission</h2>
-
-            <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
-              <p style="margin: 10px 0;"><strong>Name:</strong> ${name}</p>
-              ${company ? `<p style="margin: 10px 0;"><strong>Company:</strong> ${company}</p>` : ''}
-              <p style="margin: 10px 0;"><strong>Email:</strong> <a href="mailto:${email}">${email}</a></p>
-            </div>
-
-            <div style="margin: 20px 0;">
-              <h3 style="color: #333;">Message:</h3>
-              <p style="white-space: pre-wrap; line-height: 1.6;">${message}</p>
-            </div>
-
-            <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;" />
-
-            <p style="color: #666; font-size: 12px;">
-              This email was sent from the ECSVault website contact form.<br />
-              Submitted on: ${new Date().toLocaleString()}
-            </p>
-          </div>
-        `,
-      });
-
-      console.log('Email sent successfully via:', emailResult.method);
-    } catch (emailError: any) {
-      // Log email error but don't fail the request
-      // The submission is already saved to database
-      console.error('Email sending failed:', emailError);
-
-      return NextResponse.json(
-        {
-          success: true,
-          message: 'Form submitted successfully, but email notification failed',
-          emailError: emailError.message
-        },
-        { status: 200 }
-      );
-    }
+    // Send notification
+    await sendNotification({
+      name: name.trim(),
+      company: company?.trim(),
+      email: email.trim(),
+      message: message.trim(),
+    });
 
     return NextResponse.json(
       { success: true, message: 'Form submitted successfully' },

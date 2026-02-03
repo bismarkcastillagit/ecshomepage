@@ -1,12 +1,31 @@
 @import "tailwindcss";
 
 :root {
-  --background: #000000;
-  --foreground: #ffffff;
+  /* Light Corporate Theme - Matching Logo Purple */
+  --background: #FAFBFC;
+  --background-alt: #F1F3F5;
+  --background-dark: #E9ECEF;
+  --foreground: #1A1A2E;
+  --text-primary: #1A1A2E;
+  --text-secondary: #495057;
+  --text-muted: #6C757D;
+  
+  /* Purple from logo */
   --accent-purple: #C471FF;
+  --accent-purple-light: #D99BFF;
+  --accent-purple-dark: #A855F7;
   --accent-purple-hover: #B05FE6;
-  --text-gray: #E5E5E5;
-  --background-dark: #0a0a0a;
+  --accent-purple-bg: rgba(196, 113, 255, 0.08);
+  --accent-purple-bg-hover: rgba(196, 113, 255, 0.12);
+  
+  /* Card and borders */
+  --card-bg: #FFFFFF;
+  --card-border: #E2E8F0;
+  --card-shadow: rgba(0, 0, 0, 0.06);
+  
+  /* Gradients */
+  --gradient-purple: linear-gradient(135deg, #C471FF 0%, #A855F7 100%);
+  --gradient-hero: linear-gradient(180deg, #FAFBFC 0%, #F1F3F5 100%);
 }
 
 @theme inline {
@@ -14,7 +33,6 @@
   --color-foreground: var(--foreground);
   --color-accent: var(--accent-purple);
   --color-accent-hover: var(--accent-purple-hover);
-  --color-text-gray: var(--text-gray);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -51,12 +69,25 @@ body {
   }
 }
 
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
 .animate-fade-in {
   animation: fade-in 1s ease-out;
 }
 
 .animate-fade-in-up {
   animation: fade-in-up 1s ease-out;
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
 }
 
 .animation-delay-200 {
@@ -71,7 +102,68 @@ body {
   animation-fill-mode: forwards;
 }
 
+.animation-delay-600 {
+  animation-delay: 0.6s;
+  opacity: 0;
+  animation-fill-mode: forwards;
+}
+
 /* Gradient utilities */
 .bg-gradient-radial {
   background: radial-gradient(circle, var(--tw-gradient-stops));
+}
+
+/* Card hover effects */
+.card-hover {
+  transition: all 0.3s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px var(--card-shadow);
+}
+
+/* Product card styles */
+.product-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  padding: 2rem;
+  transition: all 0.3s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 25px 50px rgba(196, 113, 255, 0.15);
+  border-color: var(--accent-purple-light);
+}
+
+/* Button styles */
+.btn-primary {
+  background: var(--gradient-purple);
+  color: white;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(196, 113, 255, 0.3);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(196, 113, 255, 0.4);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--accent-purple);
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  border: 2px solid var(--accent-purple);
+  transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+  background: var(--accent-purple-bg);
 }
