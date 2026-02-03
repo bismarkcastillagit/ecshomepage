@@ -77,7 +77,7 @@ export default function Home() {
       <nav className="fixed top-0 left-0 right-0 z-50 bg-[var(--background)]/80 backdrop-blur-md border-b border-[var(--card-border)]">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <Image
-            src="/ecsvault-logo.png"
+            src="/ecsvault-logo-light.png"
             alt="ECSVault Logo"
             width={180}
             height={60}
@@ -103,7 +103,7 @@ export default function Home() {
         <div className="max-w-6xl mx-auto text-center relative z-10">
           <div className="mb-8 animate-fade-in">
             <Image
-              src="/ecsvault-logo.png"
+              src="/ecsvault-logo-light.png"
               alt="ECSVault Logo"
               width={500}
               height={167}
@@ -349,7 +349,7 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
             <div className="md:col-span-2">
               <Image
-                src="/ecsvault-logo.png"
+                src="/ecsvault-logo-light.png"
                 alt="ECSVault Logo"
                 width={200}
                 height={67}
