@@ -76,13 +76,15 @@ export default function Home() {
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-[var(--background)]/80 backdrop-blur-md border-b border-[var(--card-border)]">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Image
-            src="/ecsvault-logo-light.png"
-            alt="ECSVault Logo"
-            width={180}
-            height={60}
-            className="h-10 w-auto"
-          />
+          <Link href="/" className="flex-shrink-0">
+            <Image
+              src="/ecsvault-logo-light.png"
+              alt="ECSVault Logo"
+              width={210}
+              height={70}
+              className="h-12 w-auto"
+            />
+          </Link>
           <div className="hidden md:flex items-center space-x-8">
             <a href="#about" className="text-[var(--text-secondary)] hover:text-[var(--accent-purple)] transition-colors">About</a>
             <a href="#products" className="text-[var(--text-secondary)] hover:text-[var(--accent-purple)] transition-colors">Products</a>
