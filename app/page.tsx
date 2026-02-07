@@ -48,16 +48,19 @@ function ProductCard({
 }
 
 // Service Card Component
-function ServiceCard({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) {
-  return (
-    <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl p-8 card-hover">
+function ServiceCard({ icon, title, description, link }: { icon: React.ReactNode; title: string; description: string; link?: string }) {
+  const content = (
+    <div className={`bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl p-8 card-hover${link ? ' cursor-pointer' : ''}`}>
       <div className="w-14 h-14 rounded-xl bg-[var(--accent-purple-bg)] flex items-center justify-center mb-5 text-[var(--accent-purple)]">
         {icon}
       </div>
       <h3 className="text-xl font-bold text-[var(--text-primary)] mb-3">{title}</h3>
       <p className="text-[var(--text-secondary)] leading-relaxed">{description}</p>
+      {link && <p className="mt-4 text-sm text-[var(--accent-purple)] font-medium hover:underline">Learn more →</p>}
     </div>
   );
+  if (link) return <a href={link} target="_blank" rel="noopener noreferrer">{content}</a>;
+  return content;
 }
 
 export default function Home() {
