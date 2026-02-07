@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { ChatWidget } from "./components/ChatWidget";
+import Script from "next/script";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,7 +37,12 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
-        <ChatWidget />
+        <Script
+          src="https://ai.ecsvault.com/widget.js"
+          data-business-id="jh710agf54rs0hn6wpk0sj4nhd80fnvz"
+          data-api-url="https://flippant-seahorse-299.convex.site"
+          strategy="lazyOnload"
+        />
       </body>
     </html>
   );
