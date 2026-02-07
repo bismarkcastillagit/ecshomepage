@@ -1,5 +1,6 @@
 import React from 'react';
 
+// ServiceCard with optional link prop for clickable cards
 interface ServiceCardProps {
   icon: React.ReactNode;
   title: string;
