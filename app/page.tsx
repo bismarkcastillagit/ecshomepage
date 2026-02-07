@@ -216,9 +216,9 @@ export default function Home() {
             />
 
             <ProductCard
-              title="BotFlow"
-              description="AI-powered chatbot platform that automates customer interactions. Connect via WhatsApp, Telegram, and more."
-              url="https://botflow.ecsvault.com"
+              title="Elevate AI"
+              description="AI-powered chatbot platform that automates customer interactions. Connect via WhatsApp, Telegram, and your website."
+              url="https://ai.ecsvault.com"
               icon={
                 <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
@@ -374,7 +374,7 @@ export default function Home() {
               <h3 className="text-lg font-bold text-[var(--text-primary)] mb-4">Products</h3>
               <ul className="space-y-3">
                 <li><a href="https://ecommerce.ecsvault.com" target="_blank" rel="noopener noreferrer" className="text-[var(--text-secondary)] hover:text-[var(--accent-purple)] transition-colors">Elevate Commerce</a></li>
-                <li><a href="https://botflow.ecsvault.com" target="_blank" rel="noopener noreferrer" className="text-[var(--text-secondary)] hover:text-[var(--accent-purple)] transition-colors">BotFlow</a></li>
+                <li><a href="https://ai.ecsvault.com" target="_blank" rel="noopener noreferrer" className="text-[var(--text-secondary)] hover:text-[var(--accent-purple)] transition-colors">Elevate AI</a></li>
                 <li><a href="https://cybersecurity.ecsvault.com" target="_blank" rel="noopener noreferrer" className="text-[var(--text-secondary)] hover:text-[var(--accent-purple)] transition-colors">Security Services</a></li>
               </ul>
             </div>
